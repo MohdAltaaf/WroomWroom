@@ -111,8 +111,9 @@ public class CarController : MonoBehaviour
                 rb.AddForceAtPosition(totalForce, t.position);
             }   
         }
+        
         //Rear
-        for(int i = 0; i < 2; i++ )
+        for(int i = 2; i < 4; i++ )
         {
             Transform t = thrusters[i];
             if(Physics.Raycast(t.position, -t.up, restingHeight))
