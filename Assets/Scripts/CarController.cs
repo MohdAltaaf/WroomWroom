@@ -1,5 +1,6 @@
 
 
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -57,6 +58,7 @@ public class CarController : MonoBehaviour
             Suspensions();
             Engines();
             Grip();
+            Steer();
         }
     }
 
@@ -140,6 +142,17 @@ public class CarController : MonoBehaviour
             float force = rb.mass/2 * acceleration* power;
             Debug.DrawRay(thrusters[i].position, force * thrusters[i].forward);
             rb.AddForceAtPosition(force*thrusters[i].forward, thrusters[i].position);
+        }
+    }
+
+    void Steer()
+    {
+        float turnInput = movement.x;
+
+        for(int i = 0; i < 2; i++)
+        {
+            thrusters[i].localRotation = Quaternion.Euler(0f, turnAngle*turnInput, 0f);
+            Debug.DrawRay(thrusters[i].position, thrusters[i].forward*2);
         }
     }
    
