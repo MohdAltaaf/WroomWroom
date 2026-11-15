@@ -33,6 +33,8 @@ public class CarController : MonoBehaviour
 
     [Header("Visuals")]
     public Transform[] tyres;
+    public TrailRenderer[] skidmarks;
+    public float skidThreshold = 5;
     
 
 
@@ -46,6 +48,7 @@ public class CarController : MonoBehaviour
     bool brakes;
     float speedRatio;
     [SerializeField] float realTurnAngle;
+   
 
     public void OnMove(InputAction.CallbackContext context)
     {
@@ -57,10 +60,12 @@ public class CarController : MonoBehaviour
         brakes = context.ReadValueAsButton();
     }
 
+
    
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        
        
         
     }
@@ -76,6 +81,7 @@ public class CarController : MonoBehaviour
             Engines();
             Grip();
             Brakes();
+            Skid();
             
             
 
@@ -129,7 +135,8 @@ public class CarController : MonoBehaviour
                 
                 Vector3 velocity = rb.GetPointVelocity(t.position);
                 float sideVelocity = Vector3.Dot(velocity, t.right);
-                float gripForce = Mathf.Clamp(rb.mass/4 * Vector3.Magnitude(Physics.gravity)*sideVelocity * frontFrictionCoeff, -maxFrontFriction, maxFrontFriction);
+                //float gripForce = Mathf.Clamp(rb.mass/4 * Vector3.Magnitude(Physics.gravity)*sideVelocity * frontFrictionCoeff, -maxFrontFriction, maxFrontFriction);
+                float gripForce = rb.mass/4 * Vector3.Magnitude(Physics.gravity)*sideVelocity * frontFrictionCoeff;
 
                 Vector3 totalForce = - gripForce * t.right;
                 Debug.DrawRay(t.position, totalForce, Color.red);
@@ -147,7 +154,8 @@ public class CarController : MonoBehaviour
                 
                 Vector3 velocity = rb.GetPointVelocity(t.position);
                 float sideVelocity = Vector3.Dot(velocity, t.right);
-                float gripForce = Mathf.Clamp(rb.mass/4 * Vector3.Magnitude(Physics.gravity)*sideVelocity * rearFrictionCoeff, -maxRearFriction, maxRearFriction);
+                //float gripForce = Mathf.Clamp(rb.mass/4 * Vector3.Magnitude(Physics.gravity)*sideVelocity * rearFrictionCoeff, -maxRearFriction, maxRearFriction);
+                float gripForce = rb.mass/4 * Vector3.Magnitude(Physics.gravity)*sideVelocity * rearFrictionCoeff;
 
 
                 Vector3 totalForce =  -gripForce * t.right;
@@ -214,6 +222,22 @@ public class CarController : MonoBehaviour
                     
         }
         
+    }
+    void Skid()
+    {
+        for(int i = 0; i<4; i++)
+        {
+            Transform t = thrusters[i];
+            TrailRenderer mark = skidmarks[i];
+
+            if(Physics.Raycast(t.position, -t.up,  restingHeight))
+            {
+                if(Vector3.Dot(rb.linearVelocity, t.right) > skidThreshold)
+                    mark.emitting = true;
+                else 
+                    mark.emitting = false;
+            }
+        }
     }
    
 
