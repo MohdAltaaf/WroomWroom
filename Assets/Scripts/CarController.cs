@@ -29,6 +29,11 @@ public class CarController : MonoBehaviour
 
     public float brakedeceleration = 80;
 
+    [Header("Visuals")]
+    public Transform[] tyres;
+    
+
+
 
     
 
@@ -55,6 +60,7 @@ public class CarController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+       
         
     }
 
@@ -155,6 +161,14 @@ public class CarController : MonoBehaviour
         for(int i = 2; i < 4; i++)
         {
             Transform t = thrusters[i];
+            Transform vis = tyres[i];
+            float v = Vector3.Dot(rb.GetPointVelocity(vis.position), t.forward);
+            float r = restingHeight;
+            float w = v/r * Time.deltaTime;
+            float zRot = 0;
+            zRot += w;
+
+            vis.localRotation = Quaternion.Euler(0, 0, zRot);
             if(Physics.Raycast(t.position, -t.up,  restingHeight))
             {
                 float force = rb.mass/2 * acceleration* power;
@@ -169,11 +183,12 @@ public class CarController : MonoBehaviour
     void Steer()
     {
         float turnInput = movement.x;
-         realTurnAngle = turnAngle*(1 - speedRatio);
+        realTurnAngle = turnAngle*(1 - speedRatio);
 
         for(int i = 0; i < 2; i++)
         {
             thrusters[i].localRotation = Quaternion.Euler(0f,realTurnAngle*turnInput, 0f);
+            tyres[i].localRotation = Quaternion.Euler(0f,realTurnAngle*turnInput, 0f);
             Debug.DrawRay(thrusters[i].position, thrusters[i].forward*2);
         }
     }
