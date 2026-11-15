@@ -16,7 +16,7 @@ public class cameraController : MonoBehaviour
     }
 
     
-    void LateUpdate()
+    void FixedUpdate()
     {
         if(car == null)
         {
@@ -26,11 +26,11 @@ public class cameraController : MonoBehaviour
 
         transform.LookAt(car.position + car.forward * forwardLook);
         Vector3 desiredPosn = car.position - distance*car.forward + height*Vector3.up;
-        Vector3 currentPosn = transform.position;
+        
 
         
         
-        transform.position = Vector3.SmoothDamp(currentPosn, desiredPosn, ref vel, smoothTime);
+        transform.position = Vector3.Lerp(transform.position, desiredPosn, smoothTime* Time.deltaTime);
 
     }
 }

@@ -21,16 +21,24 @@ public class CarController : MonoBehaviour
     [Range(0f, 1f)] public float rearFrictionCoeff = 0.6f;
     
     [Header("Engine")]
-    public float acceleration = 3f;
+    public float maxAcceleration = 3f;
+    public float TopSpeed = 80;
     
     [Header("Steering")]
     public float turnAngle = 20;
+
+    public float brakedeceleration = 80;
+
+
+    
 
 
     //-------Input--------//
 
     Vector2 movement;
     bool brakes;
+    float speedRatio;
+    [SerializeField] float realTurnAngle;
 
     public void OnMove(InputAction.CallbackContext context)
     {
@@ -55,10 +63,16 @@ public class CarController : MonoBehaviour
     {
         if(thrusters.Length == 4)
         {
+            speedRatio = (Vector3.Dot(rb.linearVelocity, transform.forward)/TopSpeed)*(Vector3.Dot(rb.linearVelocity, transform.forward)/TopSpeed);
             Suspensions();
+            Steer();
             Engines();
             Grip();
-            Steer();
+            Brakes();
+            
+            
+
+           
         }
     }
 
@@ -136,23 +150,48 @@ public class CarController : MonoBehaviour
     void Engines()
     {
         float power = movement.y;
+        float acceleration = maxAcceleration* (1- speedRatio );
 
         for(int i = 2; i < 4; i++)
         {
-            float force = rb.mass/2 * acceleration* power;
-            Debug.DrawRay(thrusters[i].position, force * thrusters[i].forward);
-            rb.AddForceAtPosition(force*thrusters[i].forward, thrusters[i].position);
+            Transform t = thrusters[i];
+            if(Physics.Raycast(t.position, -t.up,  restingHeight))
+            {
+                float force = rb.mass/2 * acceleration* power;
+                Debug.DrawRay(thrusters[i].position, force * thrusters[i].forward);
+                rb.AddForceAtPosition(force*thrusters[i].forward, thrusters[i].position);
+            }
+            
+            
         }
     }
 
     void Steer()
     {
         float turnInput = movement.x;
+         realTurnAngle = turnAngle*(1 - speedRatio);
 
         for(int i = 0; i < 2; i++)
         {
-            thrusters[i].localRotation = Quaternion.Euler(0f, turnAngle*turnInput, 0f);
+            thrusters[i].localRotation = Quaternion.Euler(0f,realTurnAngle*turnInput, 0f);
             Debug.DrawRay(thrusters[i].position, thrusters[i].forward*2);
+        }
+    }
+
+    void Brakes()
+    {
+        if(brakes )
+        {
+            for(int i = 2; i <4; i++)
+            {
+                Transform t = thrusters[i];
+                if(Physics.Raycast(t.position, -t.up,  restingHeight))
+                {
+                    rb.AddForceAtPosition(-rb.mass/2 * brakedeceleration* Mathf.Sign(Vector3.Dot(rb.linearVelocity, transform.forward)) * t.forward , t.position);
+                    brakes = false;
+                }
+                     
+            }
         }
     }
    
