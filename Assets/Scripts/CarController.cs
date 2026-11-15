@@ -19,6 +19,8 @@ public class CarController : MonoBehaviour
     [Header("Grip")]
     [Range(0f, 1f)] public float frontFrictionCoeff = 0.6f;
     [Range(0f, 1f)] public float rearFrictionCoeff = 0.6f;
+    float maxFrontFriction;
+    float maxRearFriction;
     
     [Header("Engine")]
     public float maxAcceleration = 3f;
@@ -52,8 +54,7 @@ public class CarController : MonoBehaviour
     }
     public void OnJump(InputAction.CallbackContext context)
     {
-        if(context.performed)
-            brakes = true;
+        brakes = context.ReadValueAsButton();
     }
 
    
@@ -119,16 +120,18 @@ public class CarController : MonoBehaviour
         //Front
         for(int i = 0; i < 2; i++ )
         {
+            
             Transform t = thrusters[i];
+            maxFrontFriction = rb.mass/4* frontFrictionCoeff * Vector3.Magnitude(Physics.gravity);
             if(Physics.Raycast(t.position, -t.up,  restingHeight))
             {
                 
                 
                 Vector3 velocity = rb.GetPointVelocity(t.position);
                 float sideVelocity = Vector3.Dot(velocity, t.right);
-                float gripForce = rb.mass/4 * Vector3.Magnitude(Physics.gravity)*sideVelocity;
+                float gripForce = Mathf.Clamp(rb.mass/4 * Vector3.Magnitude(Physics.gravity)*sideVelocity * frontFrictionCoeff, -maxFrontFriction, maxFrontFriction);
 
-                Vector3 totalForce = -frontFrictionCoeff * gripForce * t.right;
+                Vector3 totalForce = - gripForce * t.right;
                 Debug.DrawRay(t.position, totalForce, Color.red);
                 rb.AddForceAtPosition(totalForce, t.position);
             }   
@@ -138,14 +141,17 @@ public class CarController : MonoBehaviour
         for(int i = 2; i < 4; i++ )
         {
             Transform t = thrusters[i];
+            maxRearFriction = rb.mass/4* rearFrictionCoeff * Vector3.Magnitude(Physics.gravity);
             if(Physics.Raycast(t.position, -t.up, restingHeight))
             {
                 
                 Vector3 velocity = rb.GetPointVelocity(t.position);
                 float sideVelocity = Vector3.Dot(velocity, t.right);
-                float gripForce = rb.mass/4 * Vector3.Magnitude(Physics.gravity)*sideVelocity;
+                float gripForce = Mathf.Clamp(rb.mass/4 * Vector3.Magnitude(Physics.gravity)*sideVelocity * rearFrictionCoeff, -maxRearFriction, maxRearFriction);
 
-                Vector3 totalForce = -rearFrictionCoeff * gripForce * t.right;
+
+                Vector3 totalForce =  -gripForce * t.right;
+                
                 Debug.DrawRay(t.position, totalForce, Color.red);
                 rb.AddForceAtPosition(totalForce, t.position);
             }
@@ -183,7 +189,7 @@ public class CarController : MonoBehaviour
     void Steer()
     {
         float turnInput = movement.x;
-        realTurnAngle = turnAngle*(1 - speedRatio);
+        realTurnAngle = turnAngle*(1); //- speedRatio);
 
         for(int i = 0; i < 2; i++)
         {
@@ -195,19 +201,19 @@ public class CarController : MonoBehaviour
 
     void Brakes()
     {
-        if(brakes )
+        if(!brakes) return;
+
+        for(int i = 2; i <4; i++)
         {
-            for(int i = 2; i <4; i++)
+            Transform t = thrusters[i];
+            if(Physics.Raycast(t.position, -t.up,  restingHeight))
             {
-                Transform t = thrusters[i];
-                if(Physics.Raycast(t.position, -t.up,  restingHeight))
-                {
-                    rb.AddForceAtPosition(-rb.mass/2 * brakedeceleration* Mathf.Sign(Vector3.Dot(rb.linearVelocity, transform.forward)) * t.forward , t.position);
-                    brakes = false;
-                }
-                     
+                rb.AddForceAtPosition(-rb.mass/2 * brakedeceleration* Mathf.Sign(Vector3.Dot(rb.linearVelocity, transform.forward)) * t.forward , t.position);
+                
             }
+                    
         }
+        
     }
    
 
