@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 public class CarController : MonoBehaviour
 {
-    private Rigidbody rb;
+    public Rigidbody rb;
 
     public Transform[] thrusters;
 
@@ -197,7 +197,7 @@ public class CarController : MonoBehaviour
     void Steer()
     {
         float turnInput = movement.x;
-        realTurnAngle = turnAngle*(1); //- speedRatio);
+        realTurnAngle = turnAngle*(1 - speedRatio);
 
         for(int i = 0; i < 2; i++)
         {
@@ -232,7 +232,7 @@ public class CarController : MonoBehaviour
 
             if(Physics.Raycast(t.position, -t.up,  restingHeight))
             {
-                if(Vector3.Dot(rb.linearVelocity, t.right) > skidThreshold)
+                if(Mathf.Abs(Vector3.Dot(rb.GetPointVelocity(t.position), t.right)) > skidThreshold)
                     mark.emitting = true;
                 else 
                     mark.emitting = false;

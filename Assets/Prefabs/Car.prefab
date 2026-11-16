@@ -47,7 +47,6 @@ GameObject:
   - component: {fileID: 4727510008317373090}
   - component: {fileID: 9221724586445787291}
   - component: {fileID: 1584472306267905101}
-  - component: {fileID: 5004356283119995195}
   - component: {fileID: 339018429814121240}
   - component: {fileID: 7211301534969788513}
   m_Layer: 0
@@ -108,6 +107,8 @@ MonoBehaviour:
   - {fileID: 1018556655509611007}
   - {fileID: 6918217190044602852}
   - {fileID: 9415412379243963}
+  skidmarks: []
+  skidThreshold: 5
   realTurnAngle: 20
 --- !u!54 &4727510008317373090
 Rigidbody:
@@ -279,27 +280,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   speedUIobject: {fileID: 0}
---- !u!65 &5004356283119995195
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 863103369546853925}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &339018429814121240
 MeshFilter:
   m_ObjectHideFlags: 0

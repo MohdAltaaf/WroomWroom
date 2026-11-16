@@ -23,7 +23,7 @@ Material:
   m_Name: wheel 7
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
   m_Parent: {fileID: 2100000, guid: 80c29a378e01d3f43af33e1695b92141, type: 2}
-  m_ModifiedSerializedProperties: 16
+  m_ModifiedSerializedProperties: 18
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -55,5 +55,6 @@ Material:
     m_Colors:
     - _BaseColor: {r: 0.3735848, g: 0, b: 0, a: 1}
     - _Color: {r: 0.37358475, g: 0, b: 0, a: 1}
+    - _EmissionColor: {r: 6.4603777, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
